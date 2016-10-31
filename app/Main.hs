@@ -62,8 +62,9 @@ taskSource intRef = do
       | otherwise    = []
 
 main = do
+  let (Just s) = mkSeconds 15
   intRef <- newIORef 0
-  runDynamicScheduler $ cfg intRef
+  runDynamicScheduler $ cfg intRef s
   forever (return ())
   where
-    cfg intRef = Config (mkSeconds 15) (taskSource intRef) (mkExecutorCount 2)
+    cfg intRef s = Config s (taskSource intRef) (mkExecutorCount 2)

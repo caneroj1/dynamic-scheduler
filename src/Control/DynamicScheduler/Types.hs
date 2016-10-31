@@ -4,7 +4,7 @@ module Control.DynamicScheduler.Types
 (
   Seconds(unSeconds)
 , mkSeconds
-, ExecutorCount
+, ExecutorCount(..)
 , mkExecutorCount
 , canRun
 , takeExecutor
@@ -27,15 +27,17 @@ import GHC.Conc (TVar)
 import System.Cron
 
 newtype Seconds = Seconds { unSeconds :: Int }
+  deriving (Eq, Show)
 
-mkSeconds :: Int -> Seconds
+mkSeconds :: Int -> Maybe Seconds
 mkSeconds s
-  | s < 0     = error "mkSeconds: unexpected negative number"
-  | otherwise = Seconds $ s * oneSecondConv
+  | s < 0     = Nothing
+  | otherwise = Just . Seconds $ s * oneSecondConv
   where
     oneSecondConv  = 1000000
 
 data ExecutorCount = Unlimited | Limited Integer
+  deriving (Eq, Show)
 
 mkExecutorCount :: Integer -> ExecutorCount
 mkExecutorCount e
