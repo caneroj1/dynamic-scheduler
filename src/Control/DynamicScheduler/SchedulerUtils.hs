@@ -11,6 +11,8 @@ import Control.Monad
 import GHC.Conc
 import System.Cron.Schedule
 
+-- | Given the number of available executors and a new list of runnable things,
+-- start scheduling them.
 startAll :: (Runnable a) => AvailableExecutors -> [a] -> IO [ThreadId]
 startAll tv = execSchedule . mapM_ (addMe tv)
   where
@@ -18,6 +20,11 @@ startAll tv = execSchedule . mapM_ (addMe tv)
       addJob (tryWithExecutor tv (run runnable))
         (toString $ schedule runnable)
 
+-- | Given the number of available executors and an IO action that should be
+-- run, try and grab an executor. If there are no available executors, then
+-- the action is not run. If there is an available executor, we take one out
+-- of the pool, run the action, and return the executor to the pool when we are
+-- finished.
 tryWithExecutor :: AvailableExecutors -> IO () -> IO ()
 tryWithExecutor ae fn = do
   scheduled <- scheduleWithExecutor ae
@@ -38,3 +45,15 @@ scheduleWithExecutor ae = atomically $ do
       writeTVar ae (takeExecutor executors) >> return True
     else
       return False
+
+canRun :: ExecutorCount -> Bool
+canRun (Limited 0) = False
+canRun _           = True
+
+takeExecutor :: ExecutorCount -> ExecutorCount
+takeExecutor (Limited n) = Limited (n-1)
+takeExecutor e           = e
+
+returnExecutor :: ExecutorCount -> ExecutorCount
+returnExecutor (Limited n) = Limited (n+1)
+returnExecutor e           = e
