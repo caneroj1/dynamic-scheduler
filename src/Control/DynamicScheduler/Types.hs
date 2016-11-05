@@ -12,12 +12,17 @@ module Control.DynamicScheduler.Types
 , source
 , executors
 , AvailableExecutors
+, ThreadMap
 ) where
 
 import Control.Concurrent (ThreadId)
+import Control.Concurrent.BroadcastChan
 import Control.Monad.State.Strict (StateT)
+import Data.Map.Strict (Map)
 import GHC.Conc (TVar)
 import System.Cron
+
+type ThreadMap a = Map a ThreadId
 
 -- | Newtype wrapper around a number of seconds
 newtype Seconds = Seconds { unSeconds :: Int }
@@ -50,7 +55,7 @@ mkExecutorCount e
 -- | Typeclass for things that can be run in the scheduler. Implement this
 -- typeclass for types that you would like to pass to the scheduler
 -- and have it manage running them.
-class Runnable a where
+class (Ord a) => Runnable a where
   -- | The run function should return some IO action that is run on a schedule.
   run      :: a -> IO ()
   -- | The schedule function should return a CronSchedule that dictates
@@ -85,3 +90,5 @@ executors :: Config a -> ExecutorCount
 executors (Config _ _ e) = e
 
 type AvailableExecutors = TVar ExecutorCount
+
+type CommandChannel a = BroadcastChan a Int
