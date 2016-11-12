@@ -9,6 +9,7 @@ import Control.DynamicScheduler.SchedulerUtils
 import Control.DynamicScheduler.Types
 import Control.Monad
 import Control.Monad.State.Strict
+import Data.Map.Strict (empty)
 import GHC.Conc
 
 -- | Given the Config settings, start running the dynamic scheduler. This will
@@ -24,21 +25,19 @@ runDynamicScheduler c = do
 scheduler :: (Runnable a) => AvailableExecutors -> Scheduler a
 scheduler tv = do
   runnables <- liftIO =<< gets (source . config)
-  threadIds <- liftIO $ startAll tv runnables
-  modify' (addThreadIds threadIds)
+  tm        <- gets threadMap
+  tm'       <- liftIO $ startAll tv tm runnables
+  modify' (\s -> s {threadMap = tm'})
   liftIO . threadDelay =<< gets (seconds . config)
   scheduler tv
 
 data SchedulerState a =
   SchedulerState {
-    threads     :: [ThreadId]
+    threadMap   :: ThreadMap a
   , config      :: Config a
   }
 
 mkSchedulerState :: Config a -> SchedulerState a
-mkSchedulerState = SchedulerState []
-
-addThreadIds :: [ThreadId] -> SchedulerState a -> SchedulerState a
-addThreadIds ts st@SchedulerState {threads = oldTs} = st {threads = ts ++ oldTs}
+mkSchedulerState = SchedulerState empty
 
 type Scheduler a = StateT (SchedulerState a) IO ()

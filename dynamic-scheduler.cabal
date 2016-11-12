@@ -26,6 +26,9 @@ library
                      , time
                      , text
                      , mtl
+                     , concurrent-extra
+                     , containers
+                     , broadcast-chan
   default-language:    Haskell2010
 
 executable dynamic-scheduler-exe

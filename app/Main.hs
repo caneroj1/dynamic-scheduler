@@ -19,6 +19,12 @@ data Task = Task
   , taskWait     :: Int
   }
 
+instance Ord Task where
+  Task{taskId = t1} <= Task{taskId = t2} = t1 <= t2
+
+instance Eq Task where
+  Task{taskId = t1} == Task{taskId = t2} = t1 == t2
+
 instance Runnable Task where
   run Task{taskId = tid, taskName = tname, taskWait = twait} = do
     putStrLn $ "Running Task #" ++ show tid ++ ", " ++ show tname

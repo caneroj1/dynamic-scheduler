@@ -1,24 +1,39 @@
 module Control.DynamicScheduler.SchedulerUtils
 (
   startAll
-, tryWithExecutor
 ) where
 
 import Control.Concurrent
 import Control.DynamicScheduler.Internal.Utils
 import Control.DynamicScheduler.Types
 import Control.Monad
+import Data.Maybe
+import Data.Time.Clock
+import qualified Data.Map.Strict as Map
 import GHC.Conc
 import System.Cron.Schedule
 
 -- | Given the number of available executors and a new list of runnable things,
 -- start scheduling them.
-startAll :: (Runnable a) => AvailableExecutors -> [a] -> IO [ThreadId]
-startAll tv = execSchedule . mapM_ (addMe tv)
+startAll :: (Runnable a)
+         => AvailableExecutors
+         -> ThreadMap a
+         -> [a]
+         -> IO (ThreadMap a)
+startAll tv = foldM (addNewRunnables tv)
   where
-    addMe tv runnable =
-      addJob (tryWithExecutor tv (run runnable))
-        (toString $ schedule runnable)
+    addNewRunnables tv tm runnable
+      | runnable `Map.member` tm = return tm
+      | otherwise                   =
+        flip (Map.insert runnable) tm <$> scheduleMe tv runnable
+
+scheduleMe :: (Runnable a) => AvailableExecutors -> a -> IO ThreadId
+scheduleMe tv runnable = forkIO . forever $ do
+  md <- nextDelay (schedule runnable) <$> getCurrentTime
+  when (isJust md) (do
+    threadDelay $ fromJust md
+    tryWithExecutor tv (run runnable))
+  return ()
 
 -- | Given the number of available executors and an IO action that should be
 -- run, try and grab an executor. If there are no available executors, then
