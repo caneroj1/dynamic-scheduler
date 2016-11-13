@@ -21,6 +21,9 @@ library
                      , Control.DynamicScheduler.Scheduler
                      , Control.DynamicScheduler.SchedulerUtils
                      , Control.DynamicScheduler.Types
+                     , Control.DynamicScheduler.Internal.NewTypes
+                     , Control.DynamicScheduler.Internal.ThreadUtils
+                     , Control.DynamicScheduler.Actions
   build-depends:       base >= 4.7 && < 5
                      , cron
                      , time
@@ -29,6 +32,11 @@ library
                      , concurrent-extra
                      , containers
                      , broadcast-chan
+                     , stm-containers
+                     , hashable
+                     , concurrent-supply
+                     , async
+                     , focus
   default-language:    Haskell2010
 
 executable dynamic-scheduler-exe
