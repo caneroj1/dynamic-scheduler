@@ -5,9 +5,11 @@ module Main where
 import Control.Concurrent
 import Control.DynamicScheduler
 import Control.Monad
+import qualified ListT as L
 import Data.IORef
 import Data.Text (Text)
 import qualified Data.Text as Text hiding (Text)
+import GHC.Conc
 import System.Cron
 import System.Cron.Types
 --
@@ -86,12 +88,29 @@ main = do
   (rId3, sch4) <- addTask r3 sch3
   putStrLn $ "Added New Task: " ++ show rId3
   threadDelay 60000000
-  putStrLn "Cancelling"
+  printScheduler sch4
+  putStrLn "Deleting"
   (r, sch5) <- deleteTask rId sch4
   print r
+  printScheduler sch5
   threadDelay 120000000
+  (rId4, sch6) <- addTask r4 sch4
+  putStrLn $ "Added New Task: " ++ show rId4
+  printScheduler sch6
+  threadDelay 65000000
+  printScheduler sch6
+  putStrLn "Cancelling!!"
+  print =<< cancelTask rId4 sch6
+  printScheduler sch6
+  (r, sch7) <- deleteTask rId4 sch6
+  print r
+  printScheduler sch7
   where
     -- cfg intRef s = Config s (taskSource intRef) (mkExecutorCount 2)
     r1 = Runner everyMinute msg "First Task"
     r2 = Runner everyTwoMinutes (putStrLn "Hello Two!") "Second Task"
     r3 = Runner everyMinute (putStrLn "Hello Three!") "Third Task"
+    r4 = Runner everyMinute (threadDelay 120000000 >> putStrLn "bobo") "Last"
+
+printScheduler :: Scheduler -> IO ()
+printScheduler s = mapM_ (print . snd) =<< (atomically . L.toList $ stream s)

@@ -11,6 +11,8 @@ import Control.DynamicScheduler.SchedulerUtils
 import Control.DynamicScheduler.Types
 import Control.Monad
 import Control.Monad.State.Strict
+import ListT (ListT)
+import qualified ListT as L hiding (ListT)
 import Data.Text
 import Data.Map.Strict (empty)
 import Focus
@@ -55,7 +57,7 @@ cancelScheduledTask rId stv = uncurry doCancel =<< toPair stv
     toPair stv = atomically $ do
       s <- readTVar stv
       return (asyncData s, status s)
-    doCancel (Just a) Running = wait a >> return Success
+    doCancel (Just a) Running = cancel a >> return Success
     doCancel _        _       = return $ NotRunning rId
 
 -- | Given a @RunnerId@ and a @Scheduler@, delete the task associated
@@ -86,3 +88,8 @@ killAndDelete rId s (Just tv) = do
   case tId of
     Nothing  -> return (NotRunning rId, s)
     (Just t) -> killThread t >> return (Success, s)
+
+stream :: Scheduler -> ListT STM (RunnerId, ScheduledRunner)
+stream = L.traverse (\(k, v) -> (,) <$> pure k <*> readTVar v)
+          . SMap.stream
+          . taskMap

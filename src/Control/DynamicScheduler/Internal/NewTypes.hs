@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Control.DynamicScheduler.Internal.NewTypes
 where
@@ -6,6 +7,7 @@ where
 import Control.Concurrent
 import Control.Concurrent.Async
 import Control.Concurrent.Broadcast
+import Control.DynamicScheduler.Internal.CronUtils
 import Control.Concurrent.Supply
 import Data.Hashable
 import Data.Text (Text)
@@ -20,6 +22,9 @@ data Runner = Runner {
   , action    :: IO ()
   , name      :: Text
   }
+
+instance Show Runner where
+  show Runner{..} = "[" ++ show name ++ "]: " ++ toString schedule
 
 -- | The Id of a @Runner@. Used a key in the @TaskMap@.
 newtype RunnerId = Id {
@@ -51,7 +56,7 @@ data Message = Awake | Kill
 data Status = CouldNotSchedule
             | Waiting
             | Running
-  deriving (Show)
+  deriving Show
 
 -- | A @ScheduledRunner@ is a wrapper around a @Runner@.
 --  It contains all of the information necessary to manage
@@ -67,6 +72,10 @@ data ScheduledRunner = ScheduledRunner {
   , status        :: Status
   , hostThread    :: Maybe ThreadId
   }
+
+instance Show ScheduledRunner where
+  show ScheduledRunner{..} =
+    show runner ++ ", " ++ show status
 
 type ScheduledRunnerTV = TVar ScheduledRunner
 

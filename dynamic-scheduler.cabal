@@ -18,6 +18,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Control.DynamicScheduler
                      , Control.DynamicScheduler.Internal.Utils
+                     , Control.DynamicScheduler.Internal.CronUtils
                      , Control.DynamicScheduler.Scheduler
                      , Control.DynamicScheduler.SchedulerUtils
                      , Control.DynamicScheduler.Types
@@ -37,6 +38,7 @@ library
                      , concurrent-supply
                      , async
                      , focus
+                     , list-t
   default-language:    Haskell2010
 
 executable dynamic-scheduler-exe
@@ -47,6 +49,7 @@ executable dynamic-scheduler-exe
                      , dynamic-scheduler
                      , text
                      , cron
+                     , list-t
   default-language:    Haskell2010
 
 test-suite dynamic-scheduler-test
