@@ -21,34 +21,38 @@ nextId s =
 
 setRunningStatus :: Async () -> ScheduledRunnerTV -> IO ()
 setRunningStatus a tv = atomically $
-  writeTVar tv =<< setAsync a <$> updateStatusSTM Running tv
+  writeTVar tv =<< updateStatusSTM (Running a) tv
 
 unsetRunningStatus :: ScheduledRunnerTV -> IO ()
 unsetRunningStatus tv = atomically $
-  writeTVar tv =<< unsetAsync <$> updateStatusSTM Waiting tv
+  writeTVar tv =<< updateStatusSTM Waiting tv
 
 updateStatusSTM :: Status -> ScheduledRunnerTV -> STM ScheduledRunner
 updateStatusSTM s tv = changeStatus s <$> readTVar tv
 
-updateHostThreadSTM :: ScheduledRunnerTV -> ThreadId -> IO ()
-updateHostThreadSTM tv tId = atomically $
-  writeTVar tv =<< changeHostThread tId <$> readTVar tv
+updateScheduleStateSTM :: ScheduledRunnerTV -> ThreadId -> IO ()
+updateScheduleStateSTM tv tId = atomically $
+  writeTVar tv =<< changeScheduleState tId <$> readTVar tv
 
 runTask :: ScheduledRunnerTV -> IO ()
-runTask s = updateHostThreadSTM s =<< forkIO threadAction
+runTask s = updateScheduleStateSTM s =<< forkIO threadAction
   where
     threadAction = do
-      cs <- atomically $ schedule . runner <$> readTVar s
+      (cs, action) <- atomically $ do
+                        r <- runner <$> readTVar s
+                        return (schedule r, action r)
       currTime <- getCurrentTime
-      handleTimeDelay $ nextDelay cs currTime
+      handleTimeDelay action $ nextDelay cs currTime
 
-    handleTimeDelay Nothing  = atomically (updateStatusSTM CouldNotSchedule s)
-                               >> threadDelay tenSeconds >> threadAction
-    handleTimeDelay (Just t) = do
+    handleTimeDelay _      Nothing  =
+      atomically (updateStatusSTM NoScheduleMatch s) >>
+      threadDelay tenSeconds                         >>
+      threadAction
+
+    handleTimeDelay action (Just t) = do
       threadDelay t
-      fn <- atomically (action . runner <$> readTVar s)
-      d  <- async fn
-      setRunningStatus d s
-      wait d
+      a <- async action
+      setRunningStatus a s
+      wait a
       unsetRunningStatus s
       threadAction

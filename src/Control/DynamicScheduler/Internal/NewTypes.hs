@@ -1,5 +1,4 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE RecordWildCards #-}
 
 module Control.DynamicScheduler.Internal.NewTypes
 where
@@ -23,8 +22,8 @@ data Runner = Runner {
   , name      :: Text
   }
 
-instance Show Runner where
-  show Runner{..} = "[" ++ show name ++ "]: " ++ toString schedule
+-- instance Show Runner where
+--   show Runner{..} = "[" ++ show name ++ "]: " ++ toString schedule
 
 -- | The Id of a @Runner@. Used a key in the @TaskMap@.
 newtype RunnerId = Id {
@@ -51,12 +50,15 @@ newtype SchedulerId = Scheduler {
 
 -- | Datatype representing different kinds of messages that can
 --  be broadcast.
-data Message = Awake | Kill
+-- data Message = Awake | Kill
 
-data Status = CouldNotSchedule
+data Status = NoScheduleMatch
             | Waiting
-            | Running
-  deriving Show
+            | Running (Async ())
+  -- deriving Show
+
+data State = NotScheduled
+           | Scheduled ThreadId
 
 -- | A @ScheduledRunner@ is a wrapper around a @Runner@.
 --  It contains all of the information necessary to manage
@@ -68,14 +70,14 @@ data ScheduledRunner = ScheduledRunner {
   -- , communicator  :: Broadcast Message
   -- , listenerId    :: ListenerId
   -- , schedulerId   :: SchedulerId
-  , asyncData     :: Maybe (Async ())
-  , status        :: Status
-  , hostThread    :: Maybe ThreadId
+  -- , asyncData     :: Maybe (Async ())
+  , runStatus     :: Status
+  , scheduleState :: State
   }
 
-instance Show ScheduledRunner where
-  show ScheduledRunner{..} =
-    show runner ++ ", " ++ show status
+-- instance Show ScheduledRunner where
+--   show ScheduledRunner{..} =
+--     show runner ++ ", " ++ show status
 
 type ScheduledRunnerTV = TVar ScheduledRunner
 
