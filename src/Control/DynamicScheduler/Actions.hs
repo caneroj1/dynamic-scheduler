@@ -57,7 +57,9 @@ cancelScheduledTask rId stv = uncurry doCancel =<< toPair stv
     toPair stv = atomically $ do
       s <- readTVar stv
       return (asyncData s, status s)
-    doCancel (Just a) Running = cancel a >> return Success
+    doCancel (Just a) Running = cancel a               >>
+                                unsetRunningStatus stv >>
+                                return Success
     doCancel _        _       = return $ NotRunning rId
 
 -- | Given a @RunnerId@ and a @Scheduler@, delete the task associated

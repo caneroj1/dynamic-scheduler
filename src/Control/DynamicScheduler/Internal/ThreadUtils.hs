@@ -2,6 +2,7 @@ module Control.DynamicScheduler.Internal.ThreadUtils
 (
   nextId
 , runTask
+, unsetRunningStatus
 ) where
 
 import Control.Concurrent.Async
