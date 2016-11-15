@@ -1,12 +1,8 @@
 module Control.DynamicScheduler
 (
-  module Control.DynamicScheduler.Scheduler
--- , module Control.DynamicScheduler.Types
-, module Control.DynamicScheduler.Internal.NewTypes
-, module Control.DynamicScheduler.Actions
+  module Control.DynamicScheduler.Internal.NewTypes
+, module Control.DynamicScheduler.API
 ) where
 
-import Control.DynamicScheduler.Scheduler
--- import Control.DynamicScheduler.Types
 import Control.DynamicScheduler.Internal.NewTypes
-import Control.DynamicScheduler.Actions
+import Control.DynamicScheduler.API

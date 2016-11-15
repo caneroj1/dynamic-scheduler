@@ -18,11 +18,14 @@ library
   hs-source-dirs:      src
   exposed-modules:     Control.DynamicScheduler
                      , Control.DynamicScheduler.Internal.Utils
+                     , Control.DynamicScheduler.Internal.FocusActions
+                     , Control.DynamicScheduler.Internal.Strategies
                      , Control.DynamicScheduler.Internal.CronUtils
                      , Control.DynamicScheduler.Scheduler
                      , Control.DynamicScheduler.SchedulerUtils
                      , Control.DynamicScheduler.Types
                      , Control.DynamicScheduler.Internal.NewTypes
+                     , Control.DynamicScheduler.API
                      , Control.DynamicScheduler.Internal.ThreadUtils
                      , Control.DynamicScheduler.Actions
   build-depends:       base >= 4.7 && < 5
