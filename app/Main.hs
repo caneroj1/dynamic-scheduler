@@ -63,6 +63,10 @@ main = do
   print =<< startTask rId2 sch
   printScheduler sch
   threadDelay 10000000
+  putStrLn "Starting Again"
+  print =<< startTask rId2 sch
+  printScheduler sch
+  threadDelay 10000000
   putStrLn "Renaming!"
   print =<< renameTask "RENAMED!" rId4 sch
   printScheduler sch

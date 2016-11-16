@@ -32,22 +32,22 @@ newTask runner scheduler = do
   where
     newScheduledRunner rId = ScheduledRunner runner rId Waiting NotScheduled
 
-cancelTask :: RunnerId -> Scheduler -> IO Report
+cancelTask :: RunnerId -> Scheduler -> Action
 cancelTask = withFocus Focus.cancelTask
 
-deleteTask :: RunnerId -> Scheduler -> IO Report
+deleteTask :: RunnerId -> Scheduler -> Action
 deleteTask = withFocus Focus.deleteTask
 
-stopTask :: RunnerId -> Scheduler -> IO Report
+stopTask :: RunnerId -> Scheduler -> Action
 stopTask = withFocus Focus.stopTask
 
-startTask :: RunnerId -> Scheduler -> IO Report
+startTask :: RunnerId -> Scheduler -> Action
 startTask = withFocus Focus.startTask
 
-renameTask :: Text -> RunnerId -> Scheduler -> IO Report
+renameTask :: Text -> RunnerId -> Scheduler -> Action
 renameTask t = withFocus (Focus.renameTask t)
 
-rescheduleTask :: CronSchedule -> RunnerId -> Scheduler -> IO Report
+rescheduleTask :: CronSchedule -> RunnerId -> Scheduler -> Action
 rescheduleTask c = withFocus (Focus.rescheduleTask c)
 
 stream :: Scheduler -> ListT STM (RunnerId, ScheduledRunner)
@@ -55,6 +55,6 @@ stream = L.traverse (\(k, v) -> (,) <$> pure k <*> readTVar v)
           . SMap.stream
           . taskMap
 
-withFocus :: FocusFunc -> RunnerId -> Scheduler -> IO Report
+withFocus :: FocusFunc -> RunnerId -> Scheduler -> Action
 withFocus f rId s =
   join . atomically $ SMap.focus f rId (taskMap s)

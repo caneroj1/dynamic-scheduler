@@ -1,8 +1,8 @@
 module Control.DynamicScheduler
 (
-  module Control.DynamicScheduler.Internal.Types
-, module Control.DynamicScheduler.API
+  module X
 ) where
 
-import Control.DynamicScheduler.Internal.Types
-import Control.DynamicScheduler.API
+import Control.DynamicScheduler.Internal.Types as X (Runner(..), Scheduler)
+import Control.DynamicScheduler.Internal.Strategies as X (Action, Report(..))
+import Control.DynamicScheduler.API as X

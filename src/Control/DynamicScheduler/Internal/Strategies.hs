@@ -1,4 +1,16 @@
 module Control.DynamicScheduler.Internal.Strategies
+(
+  execStrategy
+, cancelStrategy
+, deleteStrategy
+, stopStrategy
+, startStrategy
+, renameStrategy
+, rescheduleStrategy
+, Action
+, StrategyResult
+, Report(..)
+)
 where
 
 import Control.Concurrent.Async
@@ -68,15 +80,14 @@ startStrategy tv = do
     updateTVar s = writeTVar tv s{runStatus = Waiting}
 
 renameStrategy :: Text -> TaskMapStrategy
-renameStrategy t tv = do
-  s <- readTVar tv
-  let r = runner s
-  writeTVar tv s{runner = r{name = t}}
-  return (return Success, Keep)
+renameStrategy t = modifyRunner (\runner -> runner{name = t})
 
 rescheduleStrategy :: CronSchedule -> TaskMapStrategy
-rescheduleStrategy c tv = do
+rescheduleStrategy c = modifyRunner (\runner -> runner{schedule = c})
+
+modifyRunner :: (Runner -> Runner) -> TaskMapStrategy
+modifyRunner f tv = do
   s <- readTVar tv
   let r = runner s
-  writeTVar tv s{runner = r{schedule = c}}
+  writeTVar tv s{runner = f r}
   return (return Success, Keep)
