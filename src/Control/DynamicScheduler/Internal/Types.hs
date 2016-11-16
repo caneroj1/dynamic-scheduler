@@ -10,6 +10,7 @@ import Control.DynamicScheduler.Internal.CronUtils
 import Control.Concurrent.Supply
 import Data.Hashable
 import Data.Text (Text)
+import Data.Time.Clock
 import GHC.Conc
 import qualified STMContainers.Map as SMap
 import System.Cron
@@ -52,11 +53,18 @@ data ScheduledRunner = ScheduledRunner {
   , runnerId      :: RunnerId
   , runStatus     :: Status
   , scheduleState :: State
+  , nextTimeToRun :: Maybe UTCTime
   }
 
 instance Show ScheduledRunner where
   show ScheduledRunner{..} =
-    show runner ++ ", " ++ show runStatus ++ ", " ++ show scheduleState
+    show runner        ++
+    ", "               ++
+    show runStatus     ++
+    ", "               ++
+    show scheduleState ++
+    ", "               ++
+    show nextTimeToRun
 
 type ScheduledRunnerTV = TVar ScheduledRunner
 

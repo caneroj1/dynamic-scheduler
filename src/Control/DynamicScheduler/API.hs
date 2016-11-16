@@ -10,6 +10,7 @@ import Control.Monad
 import ListT (ListT)
 import qualified ListT as L hiding (ListT)
 import Data.Text (Text)
+import Data.Time.Clock
 import Data.Map.Strict (empty)
 import GHC.Conc
 import qualified STMContainers.Map as SMap
@@ -30,7 +31,8 @@ newTask runner scheduler = do
   runTask stv
   return rId
   where
-    newScheduledRunner rId = ScheduledRunner runner rId Waiting NotScheduled
+    newScheduledRunner rId =
+      ScheduledRunner runner rId Waiting NotScheduled Nothing
 
 cancelTask :: RunnerId -> Scheduler -> Action
 cancelTask = withFocus Focus.cancelTask

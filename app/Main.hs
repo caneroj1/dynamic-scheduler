@@ -29,7 +29,9 @@ main = do
   sch <- initScheduler
   rId <- newTask r2 sch
   putStrLn $ "Added New Task: " ++ show rId
+  printScheduler sch
   threadDelay 10000000
+  printScheduler sch
   rId2 <- newTask r1 sch
   putStrLn $ "Added New Task: " ++ show rId2
   threadDelay 60000000

@@ -65,7 +65,8 @@ stopStrategy tv = do
   return (action >> return Success, Keep)
   where
     updateTVar s = writeTVar tv s{runStatus = NoScheduleMatch,
-                                  scheduleState = NotScheduled}
+                                  scheduleState = NotScheduled,
+                                  nextTimeToRun = Nothing}
 
 startStrategy :: TaskMapStrategy
 startStrategy tv = do
