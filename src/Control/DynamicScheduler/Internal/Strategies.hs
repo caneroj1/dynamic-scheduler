@@ -58,9 +58,14 @@ stopStrategy tv = do
 startStrategy :: TaskMapStrategy
 startStrategy tv = do
   s <- readTVar tv
-  case scheduleState s of
-    (Scheduled _) -> return (return AlreadyScheduled, Keep)
-    NotScheduled  -> return (runTask tv >> return Success, Keep)
+  case (scheduleState s, runStatus s) of
+    (Scheduled _, _)                -> return (return AlreadyScheduled, Keep)
+    (NotScheduled, NoScheduleMatch) ->
+      updateTVar s >>
+      return (runTask tv >> return Success,Keep)
+    _                               -> return (return AlreadyScheduled, Keep)
+  where
+    updateTVar s = writeTVar tv s{runStatus = Waiting}
 
 renameStrategy :: Text -> TaskMapStrategy
 renameStrategy t tv = do

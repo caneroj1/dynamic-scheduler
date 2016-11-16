@@ -27,42 +27,58 @@ msg = putStrLn "Hello!"
 
 main = do
   sch <- initScheduler
-  (rId, sch2) <- newTask r2 sch
+  rId <- newTask r2 sch
   putStrLn $ "Added New Task: " ++ show rId
   threadDelay 10000000
-  (rId2, sch3) <- newTask r1 sch2
+  rId2 <- newTask r1 sch
   putStrLn $ "Added New Task: " ++ show rId2
   threadDelay 60000000
-  (rId3, sch4) <- newTask r3 sch3
+  rId3 <- newTask r3 sch
   putStrLn $ "Added New Task: " ++ show rId3
   threadDelay 20000000
-  printScheduler sch4
+  printScheduler sch
   putStrLn "Deleting"
-  -- (r, sch5) <- deleteTask rId sch4
-  r <- deleteTask rId sch4
+  r <- deleteTask rId sch
   print r
-  printScheduler sch4
+  printScheduler sch
   threadDelay 10000000
-  r <- stopTask rId sch4
+  r <- stopTask rId sch
   print r
-  printScheduler sch4
-  r <- stopTask rId2 sch4
+  printScheduler sch
+  putStrLn "Stopping!"
+  r <- stopTask rId2 sch
   print r
-  printScheduler sch4
-  -- print r
+  printScheduler sch
+  threadDelay 120000000
+  rId4 <- newTask r4 sch
+  putStrLn $ "Added New Task: " ++ show rId4
+  printScheduler sch
+  threadDelay 65000000
+  printScheduler sch
+  putStrLn "Cancelling!!"
+  print =<< cancelTask rId4 sch
+  printScheduler sch
+  threadDelay 10000000
+  putStrLn "Starting!"
+  print =<< startTask rId2 sch
+  printScheduler sch
+  threadDelay 10000000
+  putStrLn "Renaming!"
+  print =<< renameTask "RENAMED!" rId4 sch
+  printScheduler sch
+  threadDelay 10000000
+  putStrLn "Rescheduling - Not Exist"
 
-  -- threadDelay 120000000
-  -- (rId4, sch6) <- newTask r4 sch4
-  -- putStrLn $ "Added New Task: " ++ show rId4
-  -- printScheduler sch6
-  -- threadDelay 65000000
-  -- printScheduler sch6
-  -- putStrLn "Cancelling!!"
-  -- print =<< cancelTask rId4 sch6
-  -- printScheduler sch6
-  -- (r, sch7) <- deleteTask rId4 sch6
-  -- print r
-  -- printScheduler sch7
+  -- does not exist
+  print =<< rescheduleTask everyMinute rId sch
+  printScheduler sch
+  threadDelay 10000000
+  putStrLn "Rescheduling - Yes"
+
+  -- should work
+  print =<< rescheduleTask everyTwoMinutes rId2 sch
+  printScheduler sch
+  threadDelay 10000000
   where
     r1 = Runner everyMinute msg "First Task"
     r2 = Runner everyTwoMinutes (putStrLn "Hello Two!") "Second Task"

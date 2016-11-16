@@ -6,7 +6,6 @@ where
 
 import Control.Concurrent
 import Control.Concurrent.Async
-import Control.Concurrent.Broadcast
 import Control.DynamicScheduler.Internal.CronUtils
 import Control.Concurrent.Supply
 import Data.Hashable
@@ -31,28 +30,6 @@ newtype RunnerId = Id {
     unId :: Int
   } deriving (Eq, Ord, Show, Hashable)
 
--- | Newtype wrapper around a ThreadId. A @ListenerId@
---  stores the ThreadId of a thread whose only job is
---  to listen for when its corresponding task should be run.
-newtype ListenerId = Listener {
-    unListen :: ThreadId
-  }
-
--- | Newtype wrapper around a ThreadId. A @SchedulerId@
---  stores the ThreadId of a thread whose only job is to
---  schedule a task to be run. The thread corresponding to
---  this ThreadId determines how many microseconds it must
---  wait until a CronSchedule is active again, sleeps for that
---  amount of time, and then broadcasts an Awake message to
---  its listener.
-newtype SchedulerId = Scheduler {
-    unSchedule :: ThreadId
-  }
-
--- | Datatype representing different kinds of messages that can
---  be broadcast.
--- data Message = Awake | Kill
-
 data Status = NoScheduleMatch
             | Waiting
             | Running (Async ())
@@ -73,10 +50,6 @@ data State = NotScheduled
 data ScheduledRunner = ScheduledRunner {
     runner        :: Runner
   , runnerId      :: RunnerId
-  -- , communicator  :: Broadcast Message
-  -- , listenerId    :: ListenerId
-  -- , schedulerId   :: SchedulerId
-  -- , asyncData     :: Maybe (Async ())
   , runStatus     :: Status
   , scheduleState :: State
   }
@@ -92,11 +65,7 @@ type ScheduledRunnerTV = TVar ScheduledRunner
 type TaskMap = SMap.Map RunnerId ScheduledRunnerTV
 
 -- | @IdSource@ is a shared Int used for creating new @RunnerId@ types.
-type IdSource = Supply
-
--- | @IdGen@ is a type synonym for something that runs in the STM monad
---  and returns the next available @RunnerId@.
--- type IdGen = STM RunnerId
+type IdSource = TVar Supply
 
 -- | @Scheduler@ is a record that holds the IdSource, as well as
 --  the @TaskMap@ for the currently scheduled tasks.

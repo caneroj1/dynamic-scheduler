@@ -18,16 +18,18 @@ import System.Cron (CronSchedule)
 type FocusFunc = Maybe ScheduledRunnerTV -> StrategyResult
 
 initScheduler :: IO Scheduler
-initScheduler = Sch <$> SMap.newIO <*> newSupply
+initScheduler = Sch <$> SMap.newIO <*> (newTVarIO =<< newSupply)
 
-newTask :: Runner -> Scheduler -> IO (RunnerId, Scheduler)
+newTask :: Runner -> Scheduler -> IO RunnerId
 newTask runner scheduler = do
-  stv <- newTVarIO $ newScheduledRunner id'
-  atomically $ SMap.insert stv id' (taskMap scheduler)
+  (stv, rId) <- atomically $ do
+    sr  <- newTVar =<< newScheduledRunner <$> nextId (source scheduler)
+    rId <- runnerId <$> readTVar sr
+    SMap.insert sr rId (taskMap scheduler)
+    return (sr, rId)
   runTask stv
-  return (id', scheduler')
+  return rId
   where
-    (id', scheduler') = nextId scheduler
     newScheduledRunner rId = ScheduledRunner runner rId Waiting NotScheduled
 
 cancelTask :: RunnerId -> Scheduler -> IO Report

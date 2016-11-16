@@ -14,10 +14,12 @@ import Control.Monad
 import Data.Time.Clock
 import GHC.Conc
 
-nextId :: Scheduler -> (RunnerId, Scheduler)
-nextId s =
-  let (next, source') = freshId $ source s
-    in (Id next, s {source = source'})
+nextId :: TVar Supply -> STM RunnerId
+nextId ts = do
+  s <- readTVar ts
+  let (next, s') = freshId s
+  writeTVar ts s'
+  return $ Id next
 
 setRunningStatus :: Async () -> ScheduledRunnerTV -> IO ()
 setRunningStatus a tv = atomically $
