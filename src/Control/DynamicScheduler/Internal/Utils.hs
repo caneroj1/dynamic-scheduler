@@ -5,7 +5,7 @@ module Control.DynamicScheduler.Internal.Utils
 ) where
 
 import Control.Concurrent.Async
-import Control.DynamicScheduler.Internal.NewTypes
+import Control.DynamicScheduler.Internal.Types
 import GHC.Conc
 
 changeStatus :: Status -> ScheduledRunner -> ScheduledRunner

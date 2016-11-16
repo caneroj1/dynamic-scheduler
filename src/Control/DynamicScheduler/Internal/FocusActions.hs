@@ -1,8 +1,8 @@
 module Control.DynamicScheduler.Internal.FocusActions
 where
 
-import Control.DynamicScheduler.Internal.NewTypes
 import Control.DynamicScheduler.Internal.Strategies
+import Control.DynamicScheduler.Internal.Types
 import Data.Text (Text)
 import System.Cron (CronSchedule)
 

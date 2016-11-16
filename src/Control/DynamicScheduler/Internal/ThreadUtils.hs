@@ -8,7 +8,7 @@ module Control.DynamicScheduler.Internal.ThreadUtils
 import Control.Concurrent.Async
 import Control.Concurrent.Supply
 import Control.DynamicScheduler.Internal.CronUtils
-import Control.DynamicScheduler.Internal.NewTypes
+import Control.DynamicScheduler.Internal.Types
 import Control.DynamicScheduler.Internal.Utils
 import Control.Monad
 import Data.Time.Clock

@@ -3,9 +3,9 @@ where
 
 import Control.Concurrent.Supply
 import qualified Control.DynamicScheduler.Internal.FocusActions as Focus
-import Control.DynamicScheduler.Internal.NewTypes
 import Control.DynamicScheduler.Internal.Strategies
 import Control.DynamicScheduler.Internal.ThreadUtils
+import Control.DynamicScheduler.Internal.Types
 import Control.Monad
 import ListT (ListT)
 import qualified ListT as L hiding (ListT)

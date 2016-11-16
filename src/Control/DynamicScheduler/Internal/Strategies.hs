@@ -2,8 +2,8 @@ module Control.DynamicScheduler.Internal.Strategies
 where
 
 import Control.Concurrent.Async
-import Control.DynamicScheduler.Internal.NewTypes
 import Control.DynamicScheduler.Internal.ThreadUtils
+import Control.DynamicScheduler.Internal.Types
 import Data.Text (Text)
 import Focus
 import GHC.Conc

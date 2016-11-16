@@ -1,7 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE RecordWildCards #-}
 
-module Control.DynamicScheduler.Internal.NewTypes
+module Control.DynamicScheduler.Internal.Types
 where
 
 import Control.Concurrent

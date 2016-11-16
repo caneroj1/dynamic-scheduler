@@ -17,25 +17,19 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Control.DynamicScheduler
+                     , Control.DynamicScheduler.API
                      , Control.DynamicScheduler.Internal.Utils
+                     , Control.DynamicScheduler.Internal.CronUtils
                      , Control.DynamicScheduler.Internal.FocusActions
                      , Control.DynamicScheduler.Internal.Strategies
-                     , Control.DynamicScheduler.Internal.CronUtils
-                     , Control.DynamicScheduler.Scheduler
-                     , Control.DynamicScheduler.SchedulerUtils
-                     , Control.DynamicScheduler.Types
-                     , Control.DynamicScheduler.Internal.NewTypes
-                     , Control.DynamicScheduler.API
                      , Control.DynamicScheduler.Internal.ThreadUtils
-                     , Control.DynamicScheduler.Actions
+                     , Control.DynamicScheduler.Internal.Types
   build-depends:       base >= 4.7 && < 5
                      , cron
                      , time
                      , text
-                     , mtl
                      , concurrent-extra
                      , containers
-                     , broadcast-chan
                      , stm-containers
                      , hashable
                      , concurrent-supply
